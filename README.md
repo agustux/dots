@@ -4,29 +4,42 @@ Config is in hyprland.lua, includes runtime hardware detection (display outputs,
 instead of hardcoded values, so the same dotfiles port across different machines.
 Laptop battery life is priority, so power tooling (tlp, power-profiles-daemon, intel-undervolt) is included
 
-### Requirements:
+## Requirements:
 - (Minimal profile) Arch Linux
 - Internet connection
 
 This should preferably run after a clean arch install
 
-### Quickstart:
+## Quickstart:
 ```
-curl -fsSL https://raw.githubusercontent.com/agustux/dots/main/install.sh | bash -s -- <flags here>
+curl -f https://raw.githubusercontent.com/agustux/dots/main/install.sh | bash -s -- <flags>
 ```
-Flags:
-- `--hypr`      Install Hyprland (default when neither `--gnome` nor `--sway` is given)
-- `--sway`      Install Sway; add `--hypr` to also install Hyprland
-- `--gnome`     Install GNOME and switch the display manager from ly to GDM; add `--hypr`/`--sway` for a WM
+## Flags:
+### Desktop environment
+| Flag | Description |
+|---|---|
+| `--hypr` | Install Hyprland (default when neither `--gnome` nor `--sway` is given) |
+| `--sway` | Install Sway; add `--hypr` to also install Hyprland |
+| `--gnome` | Install GNOME and switch the display manager from ly to GDM<br>Add `--hypr`/`--sway` for a WM |
 
-- `--nvidia`    Install NVIDIA drivers/config (auto-detected otherwise)
-- `--graphics`  Install Mesa/Vulkan + lib32 graphics stack (included in `--bloat`)
-- `--foot`      Install foot instead of Ghostty as the terminal
-- `--print`     Install CUPS printing and Avahi/mDNS discovery (not included in `--bloat`)
-- `--bloat`     EVERYTHING: `--gnome --sway --hypr --graphics`, NVIDIA, all-vendor GPU/microcode, and extra tools
+### Hardware / drivers
+| Flag | Description |
+|---|---|
+| `--nvidia` | Install NVIDIA drivers/config (auto-detected otherwise) |
+| `--graphics` | Install Mesa/Vulkan + lib32 graphics stack (included in `--bloat`) |
 
-- `--noswap`    Skip creating the 4GB swapfile, for really storage constrained systems
-- `--update`    Only update dotfiles (for existing installs)
+### Optional software
+| Flag | Description |
+|---|---|
+| `--foot` | Install foot instead of Ghostty as the terminal |
+| `--print` | Install CUPS printing and Avahi/mDNS discovery (not included in `--bloat`) |
+| `--bloat` | Everything: `--gnome --sway --hypr --graphics --nvidia`<br>+ all-vendor GPU/microcode and extra tools |
+
+### Install behavior
+| Flag | Description |
+|---|---|
+| `--noswap` | Skip creating the 4GB swapfile, for really storage-constrained systems |
+| `--update` | Only update dotfiles (for existing installs) |
 
 The installer may modify your system configuration and will install
 packages. Review install.sh before running it if you want to see exactly
@@ -46,7 +59,6 @@ Kept at parity with Hyprland where Sway allows it. Both configs are always deplo
 - Per-machine overrides (e.g. terminal) go in the untracked `~/.config/sway/local.conf`, created by the installer.
 - `/usr/local/bin/sway` wraps the stock binary so ly's "Sway" entry gets the same GPU, VA-API, cursor and Qt env as Hyprland. `--update` only refreshes it if `--sway` is passed.
 - Sway has no native mirroring, so `sway-outputs.sh` caps the mode like Hyprland and mirrors extra displays with `wl-mirror`.
-- Screen capture goes through the wlr portal.
 - Reload the config with `Super + Shift + R`.
 
 ## Keybinds
