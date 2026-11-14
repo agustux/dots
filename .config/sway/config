@@ -145,6 +145,14 @@ bindsym $mod+Shift+S move scratchpad
 # Mouse bindings
 floating_modifier $mod normal
 
+# Super + scroll to cycle workspaces
+bindsym --whole-window $mod+button4 workspace prev
+bindsym --whole-window $mod+button5 workspace next
+
+# Three-finger swipe left/right to change workspaces
+bindgesture swipe:3:right workspace prev
+bindgesture swipe:3:left workspace next
+
 # Multimedia keys
 bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
 bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
