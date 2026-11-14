@@ -213,6 +213,12 @@ deploy_dotfiles() {
     done
   fi
 
+  # Claude Code theming
+  if [ -f "$HOME/.config/claude/settings.json" ]; then
+    mkdir -p "$HOME/.claude"
+    ln -sf "$HOME/.config/claude/settings.json" "$HOME/.claude/settings.json"
+  fi
+
   # Sway: shadow /usr/bin/sway so the stock ly entry picks up env + iGPU detection
   if [ "$SWAY" -eq 1 ]; then
     sudo install -Dm755 "$HOME/.config/sway/sway-session" /usr/local/bin/sway
