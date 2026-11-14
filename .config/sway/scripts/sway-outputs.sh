@@ -20,7 +20,15 @@ mode=$(printf '%s' "$J" | jq -r --arg o "$primary" '
 
 # Mirror other outputs (sway has no native mirroring)
 pkill -x wl-mirror
+for t in pointer touchpad; do swaymsg input "type:$t" map_to_output "$primary"; done
+for n in 1 2 3 4 5 6 7 8 9 10; do swaymsg workspace "$n" output "$primary"; done
 for o in $(printf '%s' "$J" | jq -r --arg p "$primary" '.[] | select(.name != $p) | .name'); do
   swaymsg output "$o" enable
+  swaymsg workspace "mirror-$o" output "$o"
+  swaymsg "focus output $o, workspace mirror-$o, focus output $primary"
+  for w in $(swaymsg -t get_workspaces -r | jq -r --arg o "$o" '.[] | select(.output == $o and .name != "mirror-" + $o) | .name'); do
+    swaymsg "[workspace=\"^$w\$\"] move workspace to output $primary"
+  done
   setsid wl-mirror --fullscreen-output "$o" "$primary" >/dev/null 2>&1 &
 done
+swaymsg focus output "$primary"
