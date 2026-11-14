@@ -15,32 +15,39 @@ This should preferably run after a clean arch install
 curl -fsSL https://raw.githubusercontent.com/agustux/dots/main/install.sh | bash -s -- <flags here>
 ```
 Flags:
-- `--nvidia`  Install NVIDIA drivers/config
-- `--gnome`   Install GNOME and switch the display manager from ly to GDM, still installs rest
-- `--bloat`   Install Gus-curated extra tools and utilities, including the NVIDIA driver and GNOME stuff
-- `--foot`    Install foot instead of Ghostty as the terminal
-- `--noswap`  Skip creating the 4GB swapfile, for really storage constrained systems 
-- `--update`  Only update dotfiles (for existing installs)
-- `--sway`    Also install Sway and its packages (Hyprland stays installed)
-- `--printer` Install CUPS printing and Avahi/mDNS discovery (not included in `--bloat`)
+- `--hypr`      Install Hyprland (default when neither `--gnome` nor `--sway` is given)
+- `--sway`      Install Sway; add `--hypr` to also install Hyprland
+- `--gnome`     Install GNOME and switch the display manager from ly to GDM; add `--hypr`/`--sway` for a WM
+
+- `--nvidia`    Install NVIDIA drivers/config (auto-detected otherwise)
+- `--graphics`  Install Mesa/Vulkan + lib32 graphics stack (included in `--bloat`)
+- `--foot`      Install foot instead of Ghostty as the terminal
+- `--print`     Install CUPS printing and Avahi/mDNS discovery (not included in `--bloat`)
+- `--bloat`     EVERYTHING: `--gnome --sway --hypr --graphics`, NVIDIA, all-vendor GPU/microcode, and extra tools
+
+- `--noswap`    Skip creating the 4GB swapfile, for really storage constrained systems
+- `--update`    Only update dotfiles (for existing installs)
 
 The installer may modify your system configuration and will install
 packages. Review install.sh before running it if you want to see exactly
 what will be changed.
 
+## Hyprland
+
+The default session. Both WMs can be installed side by side (`--hypr --sway`); pick one at the display manager.
+
+- Per-machine overrides (e.g. terminal) go in the untracked `~/.config/hypr/local.lua`, created by the installer.
+- Only Hyprland has pseudotiling.
+
 ## Sway
 
-Hyprland and Sway coexist. `--sway` only adds Sway's packages; both configs are always installed.
-Pick the session at the display manager (ly's stock "Sway" entry works).
+Kept at parity with Hyprland where Sway allows it. Both configs are always deployed, even if only one WM is installed.
 
-- Waybar configs are rendered at install: `config.hyprland` and `config.sway`. Each WM starts `waybar -c <file>`.
-- `/usr/local/bin/sway` wraps `/usr/bin/sway`. It sets GPU, VA-API, cursor and Qt env before launch, as `hyprland.lua` does.
-- `sway-outputs.sh` applies the same capped mode (max 1920 wide, native aspect ratio) and mirrors extra displays with `wl-mirror`.
-- Portals: `~/.config/xdg-desktop-portal/sway-portals.conf` (gtk default, wlr for ScreenCast/Screenshot).
-- Existing installs: re-run with `--update`. The old `~/.config/waybar/config` is no longer used and can be deleted.
-- Sway keybinds are in `.config/sway/config`.
-- Wallpaper: sway's `output * bg` (swaybg). Idle and suspend: swayidle (`~/.config/swayidle/config`). Lock screen: hyprlock, shared with Hyprland.
-- Per-machine overrides (e.g. terminal) go in untracked `~/.config/sway/local.conf`, created by the installer.
+- Per-machine overrides (e.g. terminal) go in the untracked `~/.config/sway/local.conf`, created by the installer.
+- `/usr/local/bin/sway` wraps the stock binary so ly's "Sway" entry gets the same GPU, VA-API, cursor and Qt env as Hyprland. `--update` only refreshes it if `--sway` is passed.
+- Sway has no native mirroring, so `sway-outputs.sh` caps the mode like Hyprland and mirrors extra displays with `wl-mirror`.
+- Screen capture goes through the wlr portal.
+- Reload the config with `Super + Shift + R`.
 
 ## Keybinds
 
