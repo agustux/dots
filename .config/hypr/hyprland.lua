@@ -298,6 +298,14 @@ hl.config({
     },
 })
 
+-- fixed fullscreen HDR looking washed out
+hl.config({
+    render = {
+        direct_scanout = 0,
+        cm_auto_hdr = 0,
+    },
+})
+
 hl.config({
     cursor = {
         no_hardware_cursors = true,
