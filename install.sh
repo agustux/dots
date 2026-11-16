@@ -258,16 +258,9 @@ IS_CHROMEBOOK=0
 [ -e /dev/cros_ec ] && IS_CHROMEBOOK=1
 compgen -G '/sys/bus/acpi/devices/GOOG*' >/dev/null && IS_CHROMEBOOK=1
 
-# T2 Mac detection (106b:1801 = Apple T2 Bridge Controller)
-IS_T2=0
-grep -qis 'v0000106Bd00001801' /sys/bus/pci/devices/*/modalias && IS_T2=1
-
-# Broadcom wifi detection (vendor ID 14e4 = Broadcom); skipped on T2 (handled manually)
+# Broadcom wifi detection (vendor ID 14e4 = Broadcom)
 NEEDS_BROADCOM_WL=0
-[ "$IS_T2" -eq 0 ] && grep -qis 'v000014E4d.*bc02sc80' /sys/bus/pci/devices/*/modalias && NEEDS_BROADCOM_WL=1
-
-# Disable undervolting on T2 Macs
-[ "$IS_T2" -eq 1 ] && UNDERVOLT_SUPPORTED=0
+grep -qis 'v000014E4d.*bc02sc80' /sys/bus/pci/devices/*/modalias && NEEDS_BROADCOM_WL=1
 
 # Parse flags (for non-interactive runs)
 BLOAT=0
@@ -379,7 +372,6 @@ PKGS_AMD=(vulkan-radeon lib32-vulkan-radeon)
 PKGS_UCODE_INTEL=(intel-ucode)
 PKGS_UCODE_AMD=(amd-ucode)
 PKGS_UNDERVOLT=(intel-undervolt)
-PKGS_T2=(t2fanrd)
 PKGS_BROADCOM=(broadcom-wl-dkms)
 PKGS_NVIDIA=(nvidia-utils lib32-nvidia-utils nvidia-open-dkms)
 PKGS_NVIDIA_LEGACY=(nvidia-580xx-utils lib32-nvidia-580xx-utils nvidia-580xx-dkms)
@@ -408,7 +400,6 @@ PKGS=(
 [ "$GNOME" -eq 1 ] && PKGS+=("${PKGS_GNOME[@]}")
 [ "$PRINT" -eq 1 ] && PKGS+=("${PKGS_PRINT[@]}")
 [ "$NEEDS_BROADCOM_WL" -eq 1 ] && PKGS+=("${PKGS_BROADCOM[@]}")
-[ "$IS_T2" -eq 1 ] && PKGS+=("${PKGS_T2[@]}")
 
 if [ "$IS_INTEL" -eq 1 ] || [ "$BLOAT" -eq 1 ]; then
   PKGS+=("${PKGS_INTEL[@]}")
@@ -491,30 +482,6 @@ if [ "$NVIDIA" -eq 1 ]; then
   cmdline_set_param iommu pt
   cmdline_set_param nvidia.NVreg_PreserveVideoMemoryAllocations 1
   cmdline_set_param nvidia_drm.modeset 1
-fi
-
-# T2 Mac
-if [ "$IS_T2" -eq 1 ]; then
-  cmdline_set_param intel_iommu on
-  cmdline_set_param iommu pt
-  cmdline_set_param pm_async off
-
-  echo t2bce_vhci | sudo tee /etc/modules-load.d/t2.conf > /dev/null
-
-  # Early-load modules (reverse order: each is prepended)
-  for m in t2bce_vhci t2bce_core t2bce_dma; do
-    grep -qE "^MODULES=\(.*\b$m\b" /etc/mkinitcpio.conf \
-      || sudo sed -i -E "s/^MODULES=\(/MODULES=($m /" /etc/mkinitcpio.conf
-  done
-
-  # Audio
-  run_in_fresh_clone https://github.com/kekrby/t2-better-audio.git ./install.sh
-
-  # Fan: daemon generates /etc/t2fand.conf on first start
-  sudo systemctl enable --now t2fanrd
-  sleep 2
-  sudo sed -i -E 's/^speed_curve\s*=.*/speed_curve=logarithmic/' /etc/t2fand.conf
-  sudo systemctl restart t2fanrd
 fi
 
 # GNOME
