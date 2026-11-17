@@ -213,10 +213,12 @@ deploy_dotfiles() {
     done
   fi
 
-  # Claude Code theming
-  if [ -f "$HOME/.config/claude/settings.json" ]; then
-    mkdir -p "$HOME/.claude"
-    ln -sf "$HOME/.config/claude/settings.json" "$HOME/.claude/settings.json"
+  # Claude Code config
+  if [ -d "$HOME/.config/claude" ]; then
+      mkdir -p "$HOME/.claude"
+      for f in settings.json CLAUDE.md; do
+          [ -f "$HOME/.config/claude/$f" ] && ln -sf "$HOME/.config/claude/$f" "$HOME/.claude/$f"
+      done
   fi
 
   # Sway: shadow /usr/bin/sway so the stock ly entry picks up env + iGPU detection
