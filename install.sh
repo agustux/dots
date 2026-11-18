@@ -274,6 +274,7 @@ SWAY=0
 HYPR=0
 UPDATE=0
 PRINT=0
+VIRT=0
 for arg in "$@"; do
   case "$arg" in
     --bloat) BLOAT=1 ;;
@@ -286,9 +287,10 @@ for arg in "$@"; do
     --print) PRINT=1 ;;
     --sway) SWAY=1 ;;
     --update) UPDATE=1 ;;
+    --virt) VIRT=1 ;;
     *)
       valid="--bloat --foot --gnome --graphics --hypr"
-      valid+=" --noswap --nvidia --print --sway --update"
+      valid+=" --noswap --nvidia --print --sway --update --virt"
       msg_err "Unknown flag: $arg\nValid: $valid"
       exit 1
       ;;
@@ -366,6 +368,7 @@ PKGS_GUI=(baobab gnome-disk-utility nautilus loupe decibels snapshot vlc vlc-plu
 PKGS_CLI=(tlp curl less man-db ufw rsync powertop nvtop zip unzip cpupower fastfetch bash-completion
     tar-scripts exfatprogs libcamera gst-plugin-libcamera pipewire-libcamera libcamera-tools
     libcamera-ipa xorg-xhost alsa-utils)
+PKGS_VIRT=(virtualbox virtualbox-host-dkms virtualbox-guest-iso virtualbox-ext-oracle)
 PKGS_PRINT=(cups system-config-printer cups-pk-helper ghostscript brlaser avahi nss-mdns)
 
 PKGS_INTEL=(intel-gpu-tools vulkan-intel lib32-vulkan-intel intel-media-driver libva-intel-driver)
@@ -400,6 +403,7 @@ PKGS=(
 [ "$FOOT" -eq 1 ] && PKGS+=(foot) || PKGS+=(ghostty)
 [ "$GNOME" -eq 1 ] && PKGS+=("${PKGS_GNOME[@]}")
 [ "$PRINT" -eq 1 ] && PKGS+=("${PKGS_PRINT[@]}")
+[ "$VIRT" -eq 1 ] && PKGS+=("${PKGS_VIRT[@]}")
 [ "$NEEDS_BROADCOM_WL" -eq 1 ] && PKGS+=("${PKGS_BROADCOM[@]}")
 
 if [ "$IS_INTEL" -eq 1 ] || [ "$BLOAT" -eq 1 ]; then
@@ -466,6 +470,12 @@ ln -sf /usr/lib/systemd/user/pipewire-pulse.socket "$HOME/.config/systemd/user/d
 if [ "$WM" -eq 1 ]; then
   sudo systemctl enable seatd.service
   sudo usermod -aG seat "$USER"
+fi
+
+# VirtualBox: USB passthrough group; param necessary for 6.12+, mitigates VERR_VMX_IN_VMX_ROOT_MODE
+if [ "$VIRT" -eq 1 ]; then
+  sudo usermod -aG vboxusers "$USER"
+  cmdline_set_param kvm.enable_virt_at_load 0
 fi
 
 # Chrultrabook Fixes (if chromebook)

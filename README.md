@@ -32,6 +32,7 @@ curl -f https://raw.githubusercontent.com/agustux/dots/main/install.sh | bash -s
 | Flag | Description |
 |---|---|
 | `--foot` | Install foot instead of Ghostty as the terminal |
+| `--virt` | Install VirtualBox, DKMS host modules, Guest Additions ISO, and Oracle extension pack
 | `--print` | Install CUPS printing and Avahi/mDNS discovery (not included in `--bloat`) |
 | `--bloat` | Everything: `--gnome --sway --hypr --graphics --nvidia`<br>+ all-vendor GPU/microcode and extra tools |
 
