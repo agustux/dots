@@ -215,10 +215,9 @@ deploy_dotfiles() {
 
   # Claude Code config
   if [ -d "$HOME/.config/claude" ]; then
-      mkdir -p "$HOME/.claude"
-      for f in settings.json CLAUDE.md; do
-          [ -f "$HOME/.config/claude/$f" ] && ln -sf "$HOME/.config/claude/$f" "$HOME/.claude/$f"
-      done
+    mkdir -p "$HOME/.claude"
+    find "$HOME/.claude" -maxdepth 1 -xtype l -lname "$HOME/.config/claude/*" -delete
+    ln -sf -t "$HOME/.claude" "$HOME/.config/claude"/*
   fi
 
   # Sway: shadow /usr/bin/sway so the stock ly entry picks up env + iGPU detection
