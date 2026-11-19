@@ -1,8 +1,8 @@
 configuration {
 	    display-drun: "";
-	    drun-display-format: "{icon}  {name}";
+	    drun-display-format: "{name}";
 	    modi: "drun";
-	    show-icons: true;
+	    show-icons: false;
 }
 
 
