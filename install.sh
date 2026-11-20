@@ -341,14 +341,6 @@ ensure_multilib || exit 1
 # Installing yay (AUR helper)
 ensure_yay || exit 1
 
-# Removing actual bloat
-REMOVE_PKGS=(polkit-kde-agent wofi kwallet dolphin uwsm kitty htop power-profiles-daemon)
-TO_REMOVE=()
-for pkg in "${REMOVE_PKGS[@]}"; do
-  pacman -Qq "$pkg" &> /dev/null && TO_REMOVE+=("$pkg")
-done
-[ "${#TO_REMOVE[@]}" -gt 0 ] && sudo pacman -Rns --noconfirm "${TO_REMOVE[@]}"
-
 # Package sets
 PKGS_WM_COMMON=(xdg-desktop-portal-gtk grim slurp wl-clipboard dunst brightnessctl jq libnotify
     waybar hyprlock hyprqt6engine rofi rofi-bluetooth-git networkmanager-dmenu ly seatd nm-connection-editor

@@ -2,7 +2,7 @@
 My minimalistic and lightweight Hyprland config for Arch with NVIDIA support(incl. 580 devices if needed), in Catppuccin Mocha.
 Config is in hyprland.lua, includes runtime hardware detection (display outputs, GPU driver, undervolt support)
 instead of hardcoded values, so the same dotfiles port across different machines.
-Laptop battery life is priority, so power tooling (tlp, power-profiles-daemon, intel-undervolt) is included
+Laptop battery life is priority, so power tooling (tlp, intel-undervolt) is included
 
 ## Requirements:
 - (Minimal profile) Arch Linux
