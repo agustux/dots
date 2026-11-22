@@ -359,7 +359,7 @@ PKGS_GUI=(baobab gnome-disk-utility nautilus loupe decibels snapshot vlc vlc-plu
     gnome-calculator gnome-clocks papers brave-origin-bin)
 PKGS_CLI=(tlp curl less man-db ufw rsync powertop nvtop zip unzip cpupower fastfetch bash-completion
     tar-scripts exfatprogs libcamera gst-plugin-libcamera pipewire-libcamera libcamera-tools
-    libcamera-ipa xorg-xhost alsa-utils)
+    libcamera-ipa xorg-xhost alsa-utils android-udev android-tools gvfs-mtp libmtp claude-code)
 PKGS_VIRT=(virtualbox virtualbox-host-dkms virtualbox-guest-iso virtualbox-ext-oracle)
 PKGS_PRINT=(cups system-config-printer cups-pk-helper ghostscript brlaser avahi nss-mdns)
 
@@ -373,7 +373,7 @@ PKGS_NVIDIA=(nvidia-utils lib32-nvidia-utils nvidia-open-dkms)
 PKGS_NVIDIA_LEGACY=(nvidia-580xx-utils lib32-nvidia-580xx-utils nvidia-580xx-dkms)
 
 PKGS_BLOAT=(proton-vpn-gtk-app obs-studio windscribe-v2-bin localsend-bin ventoy-bin yt-dlp
-    android-udev android-tools gvfs-mtp libmtp scrcpy gnirehtet-bin opencode)
+    scrcpy gnirehtet-bin opencode)
 PKGS_GRAPHICS=(mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader libdrm lib32-libdrm
     lib32-glibc lib32-gcc-libs lib32-libglvnd lib32-wayland lib32-libx11 lib32-libxcb
     lib32-libpulse lib32-libpipewire lib32-alsa-lib lib32-alsa-plugins)
