@@ -47,7 +47,6 @@ window#waybar {
 #mode,
 #idle_inhibitor,
 #scratchpad,
-#power-profiles-daemon,
 #language,
 #mpd {
     padding: 0 10px;
@@ -69,7 +68,6 @@ window#waybar {
 #mode:hover,
 #idle_inhibitor:hover,
 #scratchpad:hover,
-#power-profiles-daemon:hover,
 #language:hover,
 #mpd:hover {
     background: #181825; /* slightly lighter on hover */
