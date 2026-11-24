@@ -35,42 +35,10 @@ window#waybar {
 /* Shared styling for most modules */
 #clock,
 #battery,
-#cpu,
-#disk,
-#temperature,
-#backlight,
 #network,
-#pulseaudio,
-#wireplumber,
-#custom-media,
-#tray,
-#mode,
-#idle_inhibitor,
-#scratchpad,
-#language,
-#mpd {
+#wireplumber {
     padding: 0 10px;
     border-radius: 50px;
-}
-
-/* Hover effect for modules */
-#clock:hover,
-#battery:hover,
-#cpu:hover,
-#disk:hover,
-#temperature:hover,
-#backlight:hover,
-#network:hover,
-#pulseaudio:hover,
-#wireplumber:hover,
-#custom-media:hover,
-#tray:hover,
-#mode:hover,
-#idle_inhibitor:hover,
-#scratchpad:hover,
-#language:hover,
-#mpd:hover {
-    background: #181825; /* slightly lighter on hover */
 }
 
 /* Workspace buttons */
@@ -115,10 +83,6 @@ window#waybar {
     border-radius: 50px;
 }
 
-#bluetooth:hover {
-    background: #181825;
-}
-
 /* Power button */
 #custom-power {
     padding: 0 12px;
@@ -127,8 +91,7 @@ window#waybar {
     color: #74c7ec;
 }
 
-#custom-power:hover {
-    background: #181825;
+*:hover > #custom-power {
     color: #f38ba8;
 }
 

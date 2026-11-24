@@ -27,11 +27,6 @@
         "on-click": "networkmanager_dmenu -i"
     },
 
-    "cpu": {
-        "format": "",
-        "tooltip": false
-    },
-
     "battery": {
         "states": {
             "warning": 30,
