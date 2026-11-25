@@ -364,7 +364,7 @@ PKGS_GUI=(baobab gnome-disk-utility nautilus loupe decibels snapshot vlc vlc-plu
     gnome-calculator gnome-clocks papers brave-origin-bin)
 PKGS_CLI=(tlp curl less man-db ufw rsync powertop nvtop zip unzip cpupower fastfetch bash-completion
     tar-scripts exfatprogs libcamera gst-plugin-libcamera pipewire-libcamera libcamera-tools
-    libcamera-ipa xorg-xhost alsa-utils android-udev android-tools gvfs-mtp libmtp claude-code)
+    libcamera-ipa xorg-xhost alsa-utils android-udev android-tools gvfs-mtp libmtp cmake claude-code)
 PKGS_VIRT=(virtualbox virtualbox-host-dkms virtualbox-guest-iso virtualbox-ext-oracle)
 PKGS_PRINT=(cups system-config-printer cups-pk-helper ghostscript brlaser avahi nss-mdns)
 
@@ -593,10 +593,10 @@ sudo plymouth-set-default-theme "$PLYMOUTH_THEME"   # initramfs rebuilt at end o
 sudo sed -i -E '/^HOOKS=/{/\bplymouth\b/!s/\b(udev|systemd)\b/& plymouth/}' /etc/mkinitcpio.conf
 
 # Early KMS modules (all GPU vendors under --bloat)
-# Early KMS modules (all GPU vendors under --bloat)
 KMS_MODULES=()
 if [ "$IS_AMD" -eq 1 ] || [ "$BLOAT" -eq 1 ]; then KMS_MODULES+=(amdgpu); fi
-if [ "$IS_INTEL" -eq 1 ] || [ "$BLOAT" -eq 1 ]; then KMS_MODULES+=(i915); fi
+# i915 up to Meteor/Arrow Lake, xe for Lunar Lake+ (each only binds hardware it supports)
+if [ "$IS_INTEL" -eq 1 ] || [ "$BLOAT" -eq 1 ]; then KMS_MODULES+=(i915 xe); fi
 if [ "$NVIDIA" -eq 1 ]; then KMS_MODULES+=(nvidia nvidia_modeset nvidia_uvm nvidia_drm); fi
 mkinitcpio_append_modules "${KMS_MODULES[@]}"
 
