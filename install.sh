@@ -21,32 +21,37 @@ else
   CMDLINE_MODE=grub
   CMDLINE=/etc/default/grub
 fi
-cmdline_set_param() {
-  local key="$1" val="$2"
-  if [ "$CMDLINE_MODE" = uki ]; then
-    if grep -qP "(^|\s)${key}=\S*" "$CMDLINE"; then
-      sudo sed -i -E "s/(^|\s)${key}=[^ ]*/\1${key}=${val}/" "$CMDLINE"
-    else
-      sudo sed -i -E "s/\s*$/ ${key}=${val}/" "$CMDLINE"
-    fi
-  else
-    if grep -qP "GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*(^|\s)${key}=\S*" "$CMDLINE"; then
-      sudo sed -i -E "s/(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*)\b${key}=[^ \"]*/\1${key}=${val}/" "$CMDLINE"
-    else
-      sudo sed -i -E "s/(GRUB_CMDLINE_LINUX_DEFAULT=\")([^\"]*)\"/\1\2 ${key}=${val}\"/" "$CMDLINE"
-    fi
-  fi
-}
 
-# Bare kernel flag
-cmdline_set_flag() {
-  local flag="$1"
+# Set kernel params: cmdline_set key=val flag ...
+# Drops existing tokens with the same key and duplicates, then appends; idempotent
+cmdline_set() {
+  local current updated
   if [ "$CMDLINE_MODE" = uki ]; then
-    grep -qP "(^|\s)${flag}(\s|$)" "$CMDLINE" \
-      || sudo sed -i -E "s/\s*$/ ${flag}/" "$CMDLINE"
+    current=$(tr -s '[:space:]' ' ' < "$CMDLINE")
   else
-    grep -qP "GRUB_CMDLINE_LINUX_DEFAULT=\"([^\"]*\s)?${flag}(\s|\")" "$CMDLINE" \
-      || sudo sed -i -E "s/(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*)\"/\1 ${flag}\"/" "$CMDLINE"
+    current=$(sed -nE 's/^GRUB_CMDLINE_LINUX_DEFAULT="([^"]*)".*/\1/p' "$CMDLINE")
+  fi
+  updated=$(awk -v current="$current" -v additions="$*" '
+    function param_key(token) { sub(/=.*/, "", token); return token }
+    BEGIN {
+      num_current = split(current, current_tokens, " ")
+      num_new = split(additions, new_tokens, " ")
+      for (i = 1; i <= num_new; i++) replaced[param_key(new_tokens[i])]
+      for (i = 1; i <= num_current; i++) {
+        token = current_tokens[i]
+        if (!(param_key(token) in replaced) && !seen[token]++) result = result " " token
+      }
+      for (i = 1; i <= num_new; i++) result = result " " new_tokens[i]
+      print substr(result, 2)
+    }')
+  [ "$updated" = "$current" ] && return
+  if [ "$CMDLINE_MODE" = uki ]; then
+    printf '%s\n' "$updated" | sudo tee "$CMDLINE" >/dev/null
+  elif grep -q '^GRUB_CMDLINE_LINUX_DEFAULT=' "$CMDLINE"; then
+    sudo awk -i inplace -v line="$updated" \
+      '/^GRUB_CMDLINE_LINUX_DEFAULT=/ { $0 = "GRUB_CMDLINE_LINUX_DEFAULT=\"" line "\"" } 1' "$CMDLINE"
+  else
+    printf 'GRUB_CMDLINE_LINUX_DEFAULT="%s"\n' "$updated" | sudo tee -a "$CMDLINE" >/dev/null
   fi
 }
 
@@ -467,7 +472,7 @@ fi
 # VirtualBox: USB passthrough group; param necessary for 6.12+, mitigates VERR_VMX_IN_VMX_ROOT_MODE
 if [ "$VIRT" -eq 1 ]; then
   sudo usermod -aG vboxusers "$USER"
-  cmdline_set_param kvm.enable_virt_at_load 0
+  cmdline_set kvm.enable_virt_at_load=0
 fi
 
 # Chrultrabook Fixes (if chromebook)
@@ -482,9 +487,7 @@ if [ "$NVIDIA" -eq 1 ]; then
   sudo systemctl enable nvidia-suspend
   sudo systemctl enable nvidia-hibernate
 
-  cmdline_set_param iommu pt
-  cmdline_set_param nvidia.NVreg_PreserveVideoMemoryAllocations 1
-  cmdline_set_param nvidia_drm.modeset 1
+  cmdline_set iommu=pt nvidia.NVreg_PreserveVideoMemoryAllocations=1 nvidia_drm.modeset=1
 fi
 
 # GNOME
@@ -547,17 +550,16 @@ else
   write_if_missing "$LOCAL_SWAY" < /dev/null
 fi
 
-# Quieting kernel messages on the console
-cmdline_set_param loglevel 3
+# Quiet boot
+cmdline_set loglevel=3 quiet
 
-# Quiet boot + Plymouth splash
-cmdline_set_flag quiet
-cmdline_set_flag splash
+# Plymouth splash
+cmdline_set splash
 
-# Setting VT color scheme
-cmdline_set_param vt.default_red "30,243,166,249,137,245,148,205,88,243,166,249,137,245,148,166"
-cmdline_set_param vt.default_grn "30,139,227,226,180,194,226,214,91,139,227,226,180,194,226,173"
-cmdline_set_param vt.default_blu "46,168,161,175,250,231,213,244,112,168,161,175,250,231,213,200"
+# VT color scheme (Catppuccin Mocha)
+cmdline_set vt.default_red=30,243,166,249,137,245,148,205,88,243,166,249,137,245,148,166 \
+  vt.default_grn=30,139,227,226,180,194,226,214,91,139,227,226,180,194,226,173 \
+  vt.default_blu=46,168,161,175,250,231,213,244,112,168,161,175,250,231,213,200
 
 # Installing system configs from dotfiles
 sudo install -Dm644 "$HOME/.config/tlp/00-custom.conf" /etc/tlp.d/00-custom.conf
